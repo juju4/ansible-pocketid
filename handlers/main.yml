@@ -3,6 +3,8 @@
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: yes
+  when:
+    - not is_container | bool
 
 - name: Update apt cache
   ansible.builtin.apt:
@@ -12,6 +14,8 @@
   ansible.builtin.service:
     name: pocketid
     state: restarted
+  when:
+    - not is_container | bool
 
 - name: Restart pocketid docker
   community.docker.docker_compose_v2:
