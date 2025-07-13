@@ -1,5 +1,11 @@
 ---
 
+- name: Ensure pocket-id user in docker group
+  ansible.builtin.user:
+    name: "{{ pocketid_user }}"
+    groups: docker
+    append: yes
+
 - name: Download pocket-id docker-compose
   ansible.builtin.get_url:
     url: "{{ pocketid_compose_url }}"
