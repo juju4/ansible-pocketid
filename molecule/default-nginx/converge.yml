@@ -45,6 +45,8 @@
     # need inline and eval src
     # optional connect-src https://api.github.com/repos/pocket-id/pocket-id/releases/latest
     hardenwebserver_header_csp: "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'report-sample'; script-src-elem 'self' 'unsafe-inline' 'report-sample'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; report-uri /csp/report.php;"
+    hardenwebserver_systemd_files_acl:
+      - { p: "/etc/ssl/private/{{ hardenwebserver_target_host_cn }}.key", perm: r }
   roles:
     - juju4.pocketid
     - juju4.harden_nginx
