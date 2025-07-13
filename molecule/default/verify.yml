@@ -86,6 +86,8 @@
           - db1.stat.size != 0
           - db1.stat.mode == '0600'
           - db1.stat.pw_name == '_pocketid'
+      when:
+        - not is_container|bool
 
     - name: Check all processes
       ansible.builtin.command: ps aux
