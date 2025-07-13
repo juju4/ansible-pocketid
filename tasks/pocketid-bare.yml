@@ -1,5 +1,10 @@
 ---
 
+- name: Ensure systemd is present
+  ansible.builtin.package:
+    name: systemd
+    state: present
+
 # pocketid can create it but systemd ReadWritePaths requires it exists before
 - name: Ensure appropriate directories exist
   ansible.builtin.file:
