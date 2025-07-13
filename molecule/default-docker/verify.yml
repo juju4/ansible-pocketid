@@ -57,7 +57,7 @@
         verbosity: 1
 
     - name: Ensure process running
-      ansible.builtin.command: "pgrep -u {{ pocketid_user }} pocket-id"
+      ansible.builtin.command: "pgrep -u root docker-proxy"
       register: ps1
       changed_when: false
       failed_when: false
