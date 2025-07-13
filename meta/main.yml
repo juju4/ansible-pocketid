@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: pocketid
+  author: juju4
+  description: OIDC provider that allows users to authenticate with their passkeys to your services.
+  license: BSD
+  min_ansible_version: '1.9'
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - noble
+        - bionic
+  galaxy_tags:
+    - system
+    - identity
+    - oidc
+    - webauthn
+    - passkey
+dependencies: []

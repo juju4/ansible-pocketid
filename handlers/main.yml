@@ -1,0 +1,21 @@
+---
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Restart pocketid
+  ansible.builtin.service:
+    name: pocketid
+    state: restarted
+
+- name: Restart pocketid docker
+  community.docker.docker_compose_v2:
+    project_src: "{{ pocketid_home }}"
+    state: restarted
+  become: true
+  become_user: "{{ pocketid_user }}"

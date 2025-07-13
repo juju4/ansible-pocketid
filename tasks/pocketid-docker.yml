@@ -1,0 +1,24 @@
+---
+
+- name: Download pocket-id docker-compose
+  ansible.builtin.get_url:
+    url: "{{ pocketid_compose_url }}"
+    dest: "{{ pocketid_home }}/docker-compose.yml"
+    mode: '0600'
+    owner: "{{ pocketid_user }}"
+    checksum: "{{ pocketid_compose_hash }}"
+
+- name: Set pocket-id env
+  ansible.builtin.template:
+    src: "{{ pocketid_env_template }}"
+    dest: "{{ pocketid_home }}/.env"
+    mode: '0600'
+    owner: "{{ pocketid_user }}"
+  notify:
+    - Restart pocketid docker
+
+- name: Start pocket-id docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ pocketid_home }}"
+  become: true
+  become_user: "{{ pocketid_user }}"

@@ -1,0 +1,10 @@
+# See the documentation for more information: https://pocket-id.org/docs/configuration/environment-variables
+APP_URL={{ pocketid_app_url }}
+TRUST_PROXY={{ pocketid_trust_proxy | bool | lower }}
+MAXMIND_LICENSE_KEY={{ pocketid_maxmind_license_key }}
+PUID=1000
+PGID=1000
+PORT={{ pocketid_listen_port | default('1411') }}
+HOST={{ pocketid_listen_host | default('0.0.0.0') }}
+# UNIX_SOCKET=
+ANALYTICS_DISABLED=true

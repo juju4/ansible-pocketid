@@ -1,0 +1,50 @@
+---
+
+- name: Converge
+  hosts: all
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+  remote_user: root
+  pre_tasks:
+    - name: Ubuntu | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3-minimal)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: RedHat | Install python3
+      ansible.builtin.raw: test -e /usr/bin/python3 || (yum install -y python3)
+      register: python3
+      changed_when: "'installed' in python3.stdout"
+      when: (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: Gather Facts
+      ansible.builtin.setup:
+      when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16)
+    - name: Ubuntu Bionic+, Redhat 8+ | Enforce python3 for ansible
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when: >
+        (ansible_distribution == "Ubuntu" and ansible_distribution_major_version | int >= 16) or
+        (ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8)
+    - name: Debian | Refresh apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+    - name: Debug | var ansible_virtualization_type
+      ansible.builtin.debug:
+        var: ansible_virtualization_type
+  vars:
+    hardenwebserver_target_host_cn: "id.example.com"
+    hardenwebserver_target_host_san:
+      - "id.example.com"
+      - "{{ ansible_hostname }}"
+      - "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+    hardenwebserver_https_template: pocketid-nginx.conf.j2
+    # need inline and eval src
+    # optional connect-src https://api.github.com/repos/pocket-id/pocket-id/releases/latest
+    hardenwebserver_header_csp: "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'report-sample'; script-src-elem 'self' 'unsafe-inline' 'report-sample'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; report-uri /csp/report.php;"
+  roles:
+    - juju4.pocketid
+    - juju4.harden_nginx

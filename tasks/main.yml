@@ -1,0 +1,29 @@
+---
+
+- name: Include variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      paths:
+        - 'vars'
+
+- name: Set pocketid user
+  ansible.builtin.user:
+    name: "{{ pocketid_user }}"
+    home: "{{ pocketid_home }}"
+    system: true
+
+- name: Import pocketid-bare
+  ansible.builtin.import_tasks: pocketid-bare.yml
+  when:
+    - pocketid_setup == 'bare'
+
+- name: Import pocketid-docker
+  ansible.builtin.import_tasks: pocketid-docker.yml
+  when:
+    - pocketid_setup == 'docker'

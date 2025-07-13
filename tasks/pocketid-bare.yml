@@ -1,0 +1,39 @@
+---
+
+# pocketid can create it but systemd ReadWritePaths requires it exists before
+- name: Ensure appropriate directories exist
+  ansible.builtin.file:
+    path: "{{ pocketid_home }}/data"
+    state: directory
+    owner: "{{ pocketid_user }}"
+    mode: '0700'
+
+- name: Download pocket-id
+  ansible.builtin.get_url:
+    url: "{{ pocketid_url }}"
+    dest: /usr/local/bin/pocket-id
+    mode: '0755'
+    checksum: "{{ pocketid_hash }}"
+
+- name: Set pocket-id env
+  ansible.builtin.template:
+    src: "{{ pocketid_env_template }}"
+    dest: "{{ pocketid_home }}/.env"
+    mode: '0600'
+    owner: "{{ pocketid_user }}"
+  notify:
+    - Restart pocketid
+
+- name: Set pocketid systemd unit
+  ansible.builtin.template:
+    src: systemd-pocketid.conf.j2
+    dest: /etc/systemd/system/pocketid.service
+    mode: '0644'
+    owner: root
+  notify:
+    - Reload systemd
+    - Restart pocketid
+
+- name: End message
+  ansible.builtin.debug:
+    msg: "Go to {{ pocketid_app_url }}/setup to Sign up account"

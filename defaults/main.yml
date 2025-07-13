@@ -1,0 +1,18 @@
+---
+
+pocketid_setup: bare
+# pocketid_setup: docker
+
+pocketid_user: _pocketid
+pocketid_home: /var/lib/_pocketid
+pocketid_url: https://github.com/pocket-id/pocket-id/releases/download/v1.5.0/pocket-id-linux-amd64
+pocketid_hash: sha256:a277facee723841d7f4d20e50b9e417f5f04934cd8cc6224018543971469d050
+
+pocketid_env_template: pocketid-env.j2
+pocketid_app_url: https://pocketid.example.com
+pocketid_maxmind_license_key:
+pocketid_trust_proxy: true
+pocketid_listen_host: 127.0.0.1
+
+pocketid_compose_url: https://raw.githubusercontent.com/pocket-id/pocket-id/main/docker-compose.yml
+pocketid_compose_hash: sha256:179caa993feb2b71020feedba79de888a3dcc99c083f499bdadbbb361c8727cb

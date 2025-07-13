@@ -1,0 +1,145 @@
+---
+
+- name: Verify pocketid
+  hosts: "{{ playbook_hosts | default('all') }}"
+  vars:
+    pocketid_user: _pocketid
+    pocketid_home: /var/lib/_pocketid
+    pocketid_bin: "/usr/local/bin/pocket-id"
+    pocketid_cfg: "{{ pocketid_home }}/.env"
+    # if sqlite
+    pocketid_db: "{{ pocketid_home }}/data/pocket-id.db"
+    ports:
+      - { h: localhost, p: 1411 }
+    url: http://localhost:1411
+    url2: http://localhost:1411/.well-known/openid-configuration
+    is_container: false
+  pre_tasks:
+    - name: RedHat | Ensure ps is present
+      ansible.builtin.package:
+        name:
+          - procps-ng
+        state: present
+      when: ansible_os_family == "RedHat" and ansible_distribution_major_version | int >= 8
+    - name: Debian | Ensure ps is present
+      ansible.builtin.package:
+        name:
+          - procps
+        state: present
+      when: ansible_os_family == "Debian"
+    - name: Debug | var ansible_virtualization_type
+      ansible.builtin.debug:
+        var: ansible_virtualization_type
+    - name: Set fact is_container
+      ansible.builtin.set_fact:
+        is_container: true
+      when: >
+        (ansible_virtualization_type is defined and
+          (ansible_virtualization_type == "docker" or ansible_virtualization_type == "containerd"
+           or ansible_virtualization_type == "container"
+          )
+        )
+  tasks:
+    - name: Check executable
+      ansible.builtin.stat:
+        path: "{{ pocketid_bin }}"
+      register: bin1
+    - name: Validate pocketid executable is present
+      ansible.builtin.assert:
+        that:
+          - bin1.stat.exists
+          - bin1.stat.size != 0
+          - bin1.stat.mode == '0755'
+          - bin1.stat.pw_name == 'root'
+
+    - name: Check config file
+      ansible.builtin.stat:
+        path: "{{ pocketid_cfg }}"
+      register: cfg1
+      become: true
+      become_user: "{{ pocketid_user }}"
+    - name: Validate configuration file is present
+      ansible.builtin.assert:
+        that: cfg1.stat.exists and cfg1.stat.size != 0
+
+    - name: Run executable version
+      ansible.builtin.command:
+        cmd: "{{ pocketid_bin }}  --help"
+      changed_when: false
+      register: run1
+      failed_when: false
+    - name: Validate executable run
+      ansible.builtin.assert:
+        that:
+          - "'Usage of ' in run1.stderr"
+
+    - name: Check db file
+      ansible.builtin.stat:
+        path: "{{ pocketid_db }}"
+      register: db1
+      become: true
+      become_user: "{{ pocketid_user }}"
+    - name: Validate db file is present
+      ansible.builtin.assert:
+        that:
+          - db1.stat.exists
+          - db1.stat.size != 0
+          - db1.stat.mode == '0600'
+          - db1.stat.pw_name == '_pocketid'
+
+    - name: Check all processes
+      ansible.builtin.command: ps aux
+      changed_when: false
+      register: psa
+    - name: Debug | ps aux output
+      ansible.builtin.debug:
+        var: psa
+        verbosity: 1
+
+    - name: Ensure process running
+      ansible.builtin.command: "pgrep -u {{ pocketid_user }} pocket-id"
+      register: ps1
+      changed_when: false
+      failed_when: false
+    - name: Validate ps output
+      ansible.builtin.assert:
+        that: ps1.stdout
+      when:
+        - not is_container|bool
+
+    - name: Ensure ports are listening
+      ansible.builtin.wait_for:
+        host: "{{ item.h }}"
+        port: "{{ item.p }}"
+        timeout: 10
+      with_items: "{{ ports }}"
+      when:
+        - not is_container|bool
+
+    - name: Fetch localhost endpoint
+      ansible.builtin.uri:
+        url: "{{ url }}"
+        validate_certs: no
+        return_content: yes
+      register: web
+      failed_when: false
+    - name: Validate localhost endpoint
+      ansible.builtin.assert:
+        that: >
+          "'Sign in' in web.content"
+      when:
+        - not is_container|bool
+
+    - name: Fetch localhost openid-configuration endpoint
+      ansible.builtin.uri:
+        url: "{{ url2 }}"
+        validate_certs: no
+        return_content: yes
+      register: web2
+      failed_when: false
+    - name: Validate localhost openid-configuration endpoint
+      ansible.builtin.assert:
+        that: >
+          "'Sauthorization_endpoint' in web2.content"
+      when:
+        - not is_container|bool
