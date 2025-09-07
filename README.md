@@ -10,6 +10,9 @@ See also
 * https://docs.pocket-id.org/
 * https://demo.pocket-id.org/
 
+To sign up aka create account, go to <https://pocketid/setup>.
+To sign in from secondary device with different passkeys, use "My Account > login code" option.
+
 ## Requirements & Dependencies
 
 ### Ansible
