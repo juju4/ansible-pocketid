@@ -8,3 +8,14 @@ PORT={{ pocketid_listen_port | default('1411') }}
 HOST={{ pocketid_listen_host | default('0.0.0.0') }}
 # UNIX_SOCKET=
 ANALYTICS_DISABLED=true
+{% if pocketid_otel_enable | bool %}
+LOG_JSON=true
+TRACING_ENABLED=true
+METRICS_ENABLED=true
+OTEL_LOGS_EXPORTER=otlp
+OTEL_SERVICE_NAME=pocket-id
+# OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev,service.version=dev
+OTEL_EXPORTER_OTLP_ENDPOINT="{{ pocketid_otel_url }}"
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic {{ pocketid_otel_auth }}"
+{% endif %}
