@@ -63,7 +63,7 @@
       failed_when: false
     - name: Validate ps output
       ansible.builtin.assert:
-        that: ps1.stdout
+        that: ps1.stdout | length > 0
       when:
         - not is_container|bool
 
@@ -85,7 +85,7 @@
       failed_when: false
     - name: Validate localhost endpoint
       ansible.builtin.assert:
-        that: >
-          "'Sign in' in web.content"
+        that:
+          - "'Sign in' in web.content"
       when:
         - not is_container|bool
