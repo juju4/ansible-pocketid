@@ -142,6 +142,6 @@
     - name: Validate localhost openid-configuration endpoint
       ansible.builtin.assert:
         that:
-          - "'Sauthorization_endpoint' in web2.content"
+          - "'authorization_endpoint' in web2.content"
       when:
         - not is_container|bool
