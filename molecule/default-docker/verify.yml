@@ -86,6 +86,6 @@
     - name: Validate localhost endpoint
       ansible.builtin.assert:
         that:
-          - "'Sign in' in web.content"
+          - "'/_app/immutable/entry/' in web.content"
       when:
         - not is_container|bool
