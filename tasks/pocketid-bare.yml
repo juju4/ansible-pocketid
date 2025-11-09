@@ -18,7 +18,7 @@
     url: "{{ pocketid_url }}"
     dest: /usr/local/bin/pocket-id
     mode: '0755'
-    checksum: "{{ pocketid_hash }}"
+    checksum: "{{ pocketid_hash | default(omit) }}"
 
 - name: Set pocket-id env
   ansible.builtin.template:
