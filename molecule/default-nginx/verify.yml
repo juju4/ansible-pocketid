@@ -73,7 +73,10 @@
     - name: Validate executable run
       ansible.builtin.assert:
         that:
-          - "'Usage of ' in run1.stderr"
+          - "'By default, this command starts the pocket-id server.' in run1.stdout"
+          - "'Usage:' in run1.stdout"
+          - "'Available Commands:' in run1.stdout"
+          - "'healthcheck' in run1.stdout"
 
     - name: Check db file
       ansible.builtin.stat:
@@ -88,6 +91,8 @@
           - db1.stat.size != 0
           - db1.stat.mode == '0600'
           - db1.stat.pw_name == '_pocketid'
+      when:
+        - not is_container|bool
 
     - name: Check all processes
       ansible.builtin.command: ps aux
