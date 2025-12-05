@@ -6,7 +6,7 @@ pocketid_setup: bare
 pocketid_user: _pocketid
 pocketid_home: /var/lib/_pocketid
 # renovate: datasource=github-releases depName=pocket-id/pocket-id
-pocketid_github_version: 'v1.15.0'
+pocketid_github_version: 'v1.16.0'
 pocketid_url: "https://github.com/pocket-id/pocket-id/releases/download/{{ pocketid_github_version }}/pocket-id-linux-amd64"
 # pocketid_hash: sha256:a277facee723841d7f4d20e50b9e417f5f04934cd8cc6224018543971469d050
 
