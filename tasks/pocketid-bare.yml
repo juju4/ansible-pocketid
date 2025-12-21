@@ -19,6 +19,8 @@
     dest: /usr/local/bin/pocket-id
     mode: '0755'
     checksum: "{{ pocketid_hash | default(omit) }}"
+  notify:
+    - Restart pocketid
 
 - name: Set pocket-id env
   ansible.builtin.template:
