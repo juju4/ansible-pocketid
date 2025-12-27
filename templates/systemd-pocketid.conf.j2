@@ -20,9 +20,9 @@ UMask=077
 PrivateTmp=true
 ProtectHome=yes
 ProtectSystem=strict
-{% if (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 21) or
-      (ansible_distribution == 'Debian' and ansible_distribution_major_version|int >= 11) or
-      (ansible_distribution == 'Raspbian' and ansible_distribution_major_version|int >= 11)
+{% if (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_major_version']|int >= 21) or
+      (ansible_facts['distribution'] == 'Debian' and ansible_facts['distribution_major_version']|int >= 11) or
+      (ansible_facts['distribution'] == 'Raspbian' and ansible_facts['distribution_major_version']|int >= 11)
 %}
 ProtectProc=noaccess
 {% endif %}
