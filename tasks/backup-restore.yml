@@ -1,0 +1,50 @@
+---
+
+- name: Ensure scripts directory exists
+  ansible.builtin.file:
+    path: "{{ scriptsdir }}"
+    state: "directory"
+    mode: "0755"
+
+- name: Ensure target backup directory exists
+  ansible.builtin.file:
+    path: "{{ backupdir }}"
+    state: "directory"
+    mode: "0755"
+    owner: root
+
+- name: Add backup script
+  ansible.builtin.template:
+    src: "backup-pocketid.sh.j2"
+    dest: "{{ scriptsdir }}/backup-pocketid.sh"
+    mode: "0755"
+
+- name: Add restore script
+  ansible.builtin.template:
+    src: "restore-pocketid.sh.j2"
+    dest: "{{ scriptsdir }}/restore-pocketid.sh"
+    mode: "0755"
+
+- name: Ensure service pocketid-backup.service exists
+  ansible.builtin.template:
+    src: systemd-pocketid-backup.service.conf.j2
+    dest: /etc/systemd/system/pocketid-backup.service
+    mode: '0644'
+  notify:
+    - Reload systemd
+
+- name: Ensure service pocketid-backup.timer exists
+  ansible.builtin.template:
+    src: systemd-pocketid-backup.timer.conf.j2
+    dest: /etc/systemd/system/pocketid-backup.timer
+    mode: '0644'
+  notify:
+    - Reload systemd
+
+- name: Ensure service pocketid-backup is enabled
+  ansible.builtin.service:
+    name: pocketid-backup.timer
+    enabled: yes
+    state: started
+  when:
+    - not is_container | bool

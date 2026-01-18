@@ -1,0 +1,17 @@
+#!/bin/sh
+{{ ansible_managed | comment }}
+
+# backup script for pocketid
+# https://pocket-id.org/docs/setup/data-export-import
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+umask 077
+
+date=$(date +%Y-%m-%d)
+dest={{ backupdir }}
+[ ! -d "$dest" ] && install -d -m 0700 -o root "$dest"
+destfile="${dest}/backup-pocketid-${date}.zip"
+
+pocket-id export --path "${destfile}"
+unzip -t "${destfile}" > /dev/null
+openssl dgst -sha512 "${destfile}" > "${destfile}.distinfo"

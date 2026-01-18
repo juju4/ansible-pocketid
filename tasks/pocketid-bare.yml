@@ -41,6 +41,9 @@
     - Reload systemd
     - Restart pocketid
 
+- name: Import backup-restore
+  ansible.builtin.import_tasks: backup-restore.yml
+
 - name: End message
   ansible.builtin.debug:
     msg: "Go to {{ pocketid_app_url }}/setup to Sign up account"

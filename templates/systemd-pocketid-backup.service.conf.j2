@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=pocketid backup
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+User=root
+ExecStart={{ scriptsdir }}/backup-pocketid.sh
+WorkingDirectory={{ backupdir }}
+
+[Install]
+WantedBy=multi-user.target

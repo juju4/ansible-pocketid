@@ -1,0 +1,20 @@
+#!/bin/sh
+{{ ansible_managed | comment }}
+
+# restore script for pocketid
+# https://pocket-id.org/docs/setup/data-export-import
+
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+umask 077
+
+if [ $# -gt 1 -a -r "$1" ]; then
+    backupfile=$1
+else
+    backupfile={{ backupdir }}/backup-pocketid.zip
+fi
+
+systemctl stop pocketid
+
+pocket-id import --path "${backupfile}"
+
+systemctl start pocketid
