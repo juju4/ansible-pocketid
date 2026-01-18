@@ -135,3 +135,9 @@ jobs:
           curl -vk https://localhost
         if: ${{ always() }}
         continue-on-error: true
+      - name: After script - journalctl
+        run: |
+          set -x
+          sudo journalctl -u pocketid -l --no-pager
+        if: ${{ always() }}
+        continue-on-error: true
