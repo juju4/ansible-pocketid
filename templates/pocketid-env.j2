@@ -6,6 +6,7 @@ PUID=1000
 PGID=1000
 PORT={{ pocketid_listen_port | default('1411') }}
 HOST={{ pocketid_listen_host | default('0.0.0.0') }}
+ENCRYPTION_KEY="{{ pocketid_encryption_key }}"
 # UNIX_SOCKET=
 ANALYTICS_DISABLED=true
 {% if pocketid_otel_enable | bool %}
