@@ -16,7 +16,8 @@ pocketid_maxmind_license_key:
 pocketid_trust_proxy: true
 pocketid_listen_host: 127.0.0.1
 # Set to at least 16 characters long random string
-pocketid_encryption_key: "{{ lookup('community.general.random_string', length=64, base64=True) | escape }}"
+# Or leave role create one
+pocketid_encryption_key: ''
 
 # opentelemetry logs export - https://github.com/pocket-id/pocket-id/pull/760
 pocketid_otel_enable: false

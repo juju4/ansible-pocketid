@@ -29,6 +29,23 @@
     home: "{{ pocketid_home }}"
     system: true
 
+- name: Create encryption key
+  when:
+    - pocketid_encryption_key | length == 0
+  block:
+    - name: Include random
+      ansible.builtin.include_tasks: random.yml
+      vars:
+        secretdir: "{{ pocketid_home }}"
+        secretprefix: .secrets-pocketid
+        secretlength: 64
+        secretbase64: true
+        name_random: key
+    - name: Set fact encryption_key
+      ansible.builtin.set_fact:
+        pocketid_encryption_key: "{{ secret }}"
+      no_log: true
+
 - name: Import pocketid-bare
   ansible.builtin.import_tasks: pocketid-bare.yml
   when:
