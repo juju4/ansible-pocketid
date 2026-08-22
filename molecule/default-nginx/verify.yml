@@ -13,8 +13,9 @@
       - { h: localhost, p: 1411 }
       - { h: localhost, p: 80 }
       - { h: localhost, p: 443 }
-    url: https://localhost
-    url2: https://localhost/.well-known/openid-configuration
+    url: http://localhost:1411
+    url2: "{{ pocketid_app_url }} | default('https://localhost') }}"
+    url3: "{{ pocketid_app_url }} | default('https://localhost') }}/.well-known/openid-configuration"
     is_container: false
   pre_tasks:
     - name: RedHat | Ensure ps is present
@@ -123,7 +124,7 @@
       when:
         - not is_container|bool
 
-    - name: Fetch localhost endpoint
+    - name: Fetch localhost endpoint - direct
       ansible.builtin.uri:
         url: "{{ url }}"
         validate_certs: no
@@ -137,16 +138,30 @@
       when:
         - not is_container|bool
 
-    - name: Fetch localhost openid-configuration endpoint
+    - name: Fetch localhost endpoint - reverse-proxy
       ansible.builtin.uri:
         url: "{{ url2 }}"
         validate_certs: no
         return_content: yes
       register: web2
       failed_when: false
+    - name: Validate localhost endpoint - reverse-proxy
+      ansible.builtin.assert:
+        that:
+          - "'/_app/immutable/entry/' in web2.content"
+      when:
+        - not is_container|bool
+
+    - name: Fetch localhost openid-configuration endpoint
+      ansible.builtin.uri:
+        url: "{{ url3 }}"
+        validate_certs: no
+        return_content: yes
+      register: web3
+      failed_when: false
     - name: Validate localhost openid-configuration endpoint
       ansible.builtin.assert:
         that:
-          - "'authorization_endpoint' in web2.content"
+          - "'authorization_endpoint' in web3.content"
       when:
         - not is_container|bool
