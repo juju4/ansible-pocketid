@@ -14,8 +14,8 @@
       - { h: localhost, p: 80 }
       - { h: localhost, p: 443 }
     url: http://localhost:1411
-    url2: "{{ pocketid_app_url }} | default('https://localhost') }}"
-    url3: "{{ pocketid_app_url }} | default('https://localhost') }}/.well-known/openid-configuration"
+    url2: "{{ pocketid_app_url | default('https://localhost') }}"
+    url3: "{{ pocketid_app_url | default('https://localhost') }}/.well-known/openid-configuration"
     is_container: false
   pre_tasks:
     - name: RedHat | Ensure ps is present
@@ -43,6 +43,13 @@
           )
         )
   tasks:
+    - name: Debug | vars
+      ansible.builtin.debug:
+        var: "{{ item }}"
+      loop:
+        - url
+        - url2
+        - url3
     - name: Check executable
       ansible.builtin.stat:
         path: "{{ pocketid_bin }}"
